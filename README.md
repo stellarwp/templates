@@ -36,11 +36,6 @@ use Boomshakalaka\StellarWP\Assets\Config;
 add_action( 'plugins_loaded', function() {
 	Config::set_hook_prefix( 'boom-shakalaka' );
 	Config::set_path( PATH_TO_YOUR_PROJECT_ROOT );
-	Config::set_version( YOU_PROJECT::VERSION );
-
-	// Optionally, set a relative asset path. It defaults to `src/templates/`.
-	// This path is where your JS and CSS directories are stored.
-	Config::set_relative_asset_path( 'src/assets/' );
 } );
 ```
 
