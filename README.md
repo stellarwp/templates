@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/stellarwp/templates/workflows/Tests/badge.svg)](https://github.com/stellarwp/templates/actions?query=branch%3Amain) [![Static Analysis](https://github.com/stellarwp/templates/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/stellarwp/templates/actions/workflows/static-analysis.yml)
 
-A library for templating in WordPress.
+A library for including templates in a WordPress plugin that users can choose to override within a specific directory of a theme or child theme.
 
 ## Installation
 
@@ -33,3 +33,28 @@ add_action( 'plugins_loaded', function() {
 } );
 ```
 
+Once you've configured the library, use the [Template](src/Templates/Template.php) class to define a set of templates for your plugin.
+
+```php
+use Boomshakalaka\StellarWP\Templates\Template;
+
+$template = new Template();
+
+$template->set_template_origin( '/full/path/to/plugin/root' );
+$template->set_template_folder( 'src/views/products' );
+$template->set_template_folder_lookup( true );
+$template->set_template_context_extract( true );
+```
+With the template class set up, calling `$template->template('template-file')` will include the template looking for it in:
+1. child theme
+```
+.../themes/child/boom-shakalaka/products/template-file
+```
+2. parent theme
+```
+.../themes/parent/boom-shakalaka/products/template-file
+```
+3. the plugin
+```
+.../plugins/your-plugin/src/views/products/template-file
+```
