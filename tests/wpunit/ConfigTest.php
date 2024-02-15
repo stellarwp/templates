@@ -4,12 +4,12 @@ namespace StellarWP\Templates;
 use StellarWP\Templates\Tests\TemplateTestCase;
 
 class ConfigTest extends TemplateTestCase {
-	public function setUp() {
+	public function setUp(): void {
 		// before
 		parent::setUp();
 	}
 
-	public function tearDown() {
+	public function tearDown(): void {
 		parent::tearDown();
 		Config::reset();
 	}

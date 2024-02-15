@@ -7,7 +7,7 @@ use StellarWP\Templates\Config;
 class TemplateTestCase extends \Codeception\TestCase\WPTestCase {
 	protected $backupGlobals = false;
 
-	public function setUp() {
+	public function setUp(): void {
 		// before
 		parent::setUp();
 
