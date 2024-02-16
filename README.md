@@ -33,28 +33,40 @@ add_action( 'plugins_loaded', function() {
 } );
 ```
 
-Once you've configured the library, use the [Template](src/Templates/Template.php) class to define a set of templates for your plugin.
+Once you've configured the library, extend the [Template](src/Templates/Template.php) class to define the location of templates for your plugin.
 
+With your class extension, manually define where the base folder for templates is in the class' `plugin_path` property. Here is an example of what that class may look like:
 ```php
 use Boomshakalaka\StellarWP\Templates\Template;
 
-$template = new Template();
+class My_Custom_Template extends Template {
 
-$template->set_template_origin( '/full/path/to/plugin/root' );
+	/**
+	 * Defines the base path for the templates.
+	 *
+	 * @since 1.0.0
+	 */
+	protected array $template_base_path = [ PATH_TO_YOUR_PROJECT_ROOT ];
+
+}
+```
+Once you've done that, you can instantiate your class instance and define a few other settings:
+```php
+// Set the folder within your plugin where templates are stored.
 $template->set_template_folder( 'src/views/products' );
+// Should users be able to override templates in their theme?
 $template->set_template_folder_lookup( true );
-$template->set_template_context_extract( true );
 ```
 With the template class set up, calling `$template->template('template-file')` will include the template looking for it in:
 1. child theme
 ```
-.../themes/child/boom-shakalaka/products/template-file
+../themes/child/boom-shakalaka/products/template-file
 ```
-2. parent theme
+1. parent theme
 ```
-.../themes/parent/boom-shakalaka/products/template-file
+../themes/parent/boom-shakalaka/products/template-file
 ```
-3. the plugin
+1. the plugin
 ```
-.../plugins/your-plugin/src/views/products/template-file
+../plugins/your-plugin/src/views/products/template-file
 ```
