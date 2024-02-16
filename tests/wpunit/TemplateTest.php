@@ -1,6 +1,8 @@
 <?php
 
 namespace StellarWP\Templates;
+
+use InvalidArgumentException;
 use StellarWP\Templates\Tests\Dummy_Plugin_Origin;
 use StellarWP\Templates\Tests\TemplateTestCase;
 
@@ -304,5 +306,52 @@ class TemplateTest extends TemplateTestCase {
 
 		// What we look for is not really relevant: the assertions happens before.
 		$template->get_template_file( [ 'foo', 'bar', 'component' ] );
+	}
+
+	/**
+	 * It should set template folder.
+	 *
+	 * @test
+	 */
+	public function it_should_set_template_folder_with_string() {
+		$template = new Template();
+		$template->set_template_folder( 'src/templates' );
+
+		$this->assertCount( 2, $template->get_template_folder() );
+		$this->assertSame( [ 'src', 'templates' ], $template->get_template_folder() );
+	}
+
+	/**
+	 * It should default to already set class folder.
+	 *
+	 * @test
+	 */
+	public function it_should_default_to_extended_class_definition() {
+		$template = new class extends Template {
+			protected array $folder = [ 'src', 'templates', 'etc'];
+		};
+
+		$template->set_template_folder();
+
+		$this->assertIsArray( $template->get_template_folder() );
+		$this->assertSame( [ 'src', 'templates', 'etc'], $template->get_template_folder() );
+	}
+
+	/**
+	 * It should correctly set the template folder lookup.
+	 *
+	 * @test
+	 */
+	public function it_should_correctly_set_the_template_folder_lookup() {
+		$template = new Template();
+
+		$instance = $template->set_template_folder_lookup();
+
+		$this->assertTrue( $instance->get_template_folder_lookup() );
+		$this->assertInstanceOf( Template::class, $template->set_template_folder_lookup() );
+
+		$template->set_template_folder_lookup( false );
+
+		$this->assertFalse( $template->get_template_folder_lookup() );
 	}
 }
