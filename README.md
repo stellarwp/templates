@@ -52,6 +52,8 @@ class My_Custom_Template extends Template {
 ```
 Once you've done that, you can instantiate your class instance and define a few other settings:
 ```php
+$template = new My_Custom_Template();
+
 // Set the folder within your plugin where templates are stored.
 $template->set_template_folder( 'src/views/products' );
 // Should users be able to override templates in their theme?
