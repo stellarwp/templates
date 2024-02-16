@@ -16,11 +16,6 @@ class Config {
 	protected static string $root_path = '';
 
 	/**
-	 * @var array<string, string>
-	 */
-	protected static array $path_urls = [];
-
-	/**
 	 * Gets the hook prefix.
 	 *
 	 * @return string
@@ -47,25 +42,11 @@ class Config {
 	}
 
 	/**
-	 * Gets the root path of the project.
-	 *
-	 * @return string
-	 */
-	public static function get_url( $path ): string {
-		if ( empty( static::$path_urls[ $path ] ) ) {
-			static::$path_urls[ $path ] = trailingslashit( plugins_url( basename( $path ), $path ) );
-		}
-
-		return static::$path_urls[ $path ];
-	}
-
-	/**
 	 * Resets this class back to the defaults.
 	 */
 	public static function reset() {
 		static::$hook_prefix         = '';
 		static::$root_path           = '';
-		static::$path_urls           = [];
 	}
 
 	/**
