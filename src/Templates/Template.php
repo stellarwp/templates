@@ -10,15 +10,6 @@ use StellarWP\Templates\Utils\Strings;
 
 class Template {
 	/**
-	 * The folders into which we will look for the template.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @var array
-	 */
-	protected array $folder = [];
-
-	/**
 	 * The origin class for the plugin where the template lives
 	 *
 	 * @since 1.0.0
@@ -26,6 +17,15 @@ class Template {
 	 * @var object
 	 */
 	public $origin;
+
+	/**
+	 * The folders into which we will look for the template.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @var array
+	 */
+	protected array $folder = [];
 
 	/**
 	 * The local context for templates, mutable on every self::template() call
@@ -400,68 +400,6 @@ class Template {
 	}
 
 	/**
-	 * Fetches the path for locating files in the Plugin Folder
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return string
-	 */
-	protected function get_template_plugin_path() {
-		$hook_prefix = Config::get_hook_prefix();
-
-		// Craft the plugin Path
-		$path = array_merge( $this->template_base_path, $this->folder );
-
-		// Implode to avoid Window Problems
-		$path = implode( DIRECTORY_SEPARATOR, $path );
-
-		/**
-		 * Allows filtering of the base path for templates
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param string $path     Complete path to include the base plugin folder
-		 * @param self   $template Current instance of the self.
-		 */
-		return apply_filters( "stellarwp/templates/{$hook_prefix}/template_plugin_path", $path, $this );
-	}
-
-	/**
-	 * Fetches the Namespace for the public paths, normally folders to look for
-	 * in the theme's directory.
-	 *
-	 * @since 1.0.0
-	 * @since 1.0.0
-	 *
-	 * @param string $plugin_namespace Overwrite the origin namespace with a given one.
-	 *
-	 * @return array Namespace where we to look for templates.
-	 */
-	protected function get_template_public_namespace( $plugin_namespace ) {
-		$hook_prefix = Config::get_hook_prefix();
-
-		$namespace = [
-			$hook_prefix,
-		];
-
-		if ( ! empty( $plugin_namespace ) ) {
-			$namespace[] = $plugin_namespace;
-		} elseif ( ! empty( $this->origin->template_namespace ) ) {
-			$namespace[] = $this->origin->template_namespace;
-		}
-
-		/**
-		 * Allows filtering of the base path for templates
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param array $namespace Which is the namespace we will look for files in the theme
-		 * @param self  $template  Current instance of the self.
-		 */
-		return apply_filters( "stellarwp/templates/{$hook_prefix}/template_public_namespace", $namespace, $this );
-	}
-
-	/**
 	 * Fetches which base folder we look for templates in the origin plugin.
 	 *
 	 * @since 1.0.0
@@ -480,122 +418,6 @@ class Template {
 		 * @param self  $template  Current instance of the self.
 		 */
 		return apply_filters( "stellarwp/templates/{$hook_prefix}/template_origin_base_folder", $this->template_origin_base_folder, $this );
-	}
-
-	/**
-	 * Fetches the path for locating files given a base folder normally theme related.
-	 *
-	 * @since 1.0.0
-	 * @since 1.0.0
-	 *
-	 * @param mixed  $base      Base path to look into.
-	 * @param string $namespace Adds the plugin namespace to the path returned.
-	 *
-	 * @return string  The public path for a given base.˙˙
-	 */
-	protected function get_template_public_path( $base, $namespace ) {
-		$hook_prefix = Config::get_hook_prefix();
-
-		// Craft the plugin Path
-		$path = array_merge( Arr::wrap( $base ), $this->get_template_public_namespace( $namespace ) );
-
-		// Pick up if the folder needs to be added to the public template path.
-		$folder = array_diff( $this->folder, $this->get_template_origin_base_folder() );
-
-		if ( ! empty( $folder ) ) {
-			$path = array_merge( $path, $folder );
-		}
-
-		// Implode to avoid Window Problems
-		$path = implode( DIRECTORY_SEPARATOR, $path );
-
-		/**
-		 * Allows filtering of the base path for templates
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param string $path     Complete path to include the base public folder
-		 * @param self   $template Current instance of the self.
-		 */
-		return apply_filters( "stellarwp/templates/{$hook_prefix}/template_public_path", $path, $this );
-	}
-
-	/**
-	 * Fetches the folders in which we will look for a given file
-	 *
-	 * @since 1.0.0
-	 * @since 1.0.0
-	 *
-	 * @return array<string,array> A list of possible locations for the template file.
-	 */
-	protected function get_template_path_list() {
-		$hook_prefix = Config::get_hook_prefix();
-		$folders     = [];
-
-		$folders['plugin'] = [
-			'id'       => 'plugin',
-			'priority' => 20,
-			'path'     => $this->get_template_plugin_path(),
-		];
-
-		$folders = array_merge( $folders, $this->apply_aliases( $folders ) );
-
-		/**
-		 * Allows filtering of the list of folders in which we will look for the
-		 * template given.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param array $folders  Complete path to include the base public folder
-		 * @param self  $template Current instance of the self.
-		 */
-		$folders = apply_filters( "stellarwp/templates/{$hook_prefix}/template_path_list", $folders, $this );
-		$folders = Arr::wrap( $folders );
-
-		Arr::sort_by_priority( $folders );
-
-		return $folders;
-	}
-
-	/**
-	 * Get the list of theme related folders we will look up for the template.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $namespace Which plugin namespace we are looking for.
-	 *
-	 * @return array
-	 */
-	protected function get_template_theme_path_list( $namespace ) {
-		$hook_prefix = Config::get_hook_prefix();
-		$folders     = [];
-
-		$folders['child-theme']  = [
-			'id'       => 'child-theme',
-			'priority' => 10,
-			'path'     => $this->get_template_public_path( STYLESHEETPATH, $namespace ),
-		];
-		$folders['parent-theme'] = [
-			'id'       => 'parent-theme',
-			'priority' => 15,
-			'path'     => $this->get_template_public_path( TEMPLATEPATH, $namespace ),
-		];
-
-		/**
-		 * Allows filtering of the list of theme folders in which we will look for the template.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param array  $folders   Complete path to include the base public folder.
-		 * @param string $namespace Loads the files from a specified folder from the themes.
-		 * @param self   $template  Current instance of the self.
-		 */
-		$folders = apply_filters( "stellarwp/templates/{$hook_prefix}/template_theme_path_list", $folders, $namespace, $this );
-		$folders = Arr::wrap( $folders );
-
-		Arr::sort_by_priority( $folders );
-
-		return $folders;
 	}
 
 	/**
@@ -934,62 +756,6 @@ class Template {
 	}
 
 	/**
-	 * Run the hooks for the container entry points.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $html The html of the current template.
-	 *
-	 * @return string Either the final entry point content HTML or `false` if no entry point could be found or set to false.
-	 */
-	private function template_hook_container_entry_points( $html ) {
-
-		$matches      = $this->get_entry_point_matches( $html );
-		$html_matches = $matches[0];
-
-		if ( 0 === count( $html_matches ) ) {
-			return $html;
-		}
-
-		$html_tags      = $matches['tag'];
-		$html_tags_ends = $matches['is_end'];
-
-		// Get first and last tags.
-		$first_tag = reset( $html_tags );
-		$last_tag  = end( $html_tags );
-
-		// Determine if first last tags are tag ends.
-		$first_tag_is_end = '/' === reset( $html_tags_ends );
-		$last_tag_is_end  = '/' === end( $html_tags_ends );
-
-		// When first and last tag are not the same, bail.
-		if ( $first_tag !== $last_tag ) {
-			return $html;
-		}
-
-		// If the first tag is a html tag end, bail.
-		if ( $first_tag_is_end ) {
-			return $html;
-		}
-
-		// If the last tag is not and html tag end, bail.
-		if ( ! $last_tag_is_end ) {
-			return $html;
-		}
-
-		$first_tag_html = reset( $html_matches );
-		$last_tag_html  = end( $html_matches );
-
-		$open_container_entry_point_html  = $this->do_entry_point( 'after_container_open', false );
-		$close_container_entry_point_html = $this->do_entry_point( 'before_container_close', false );
-
-		$html = Strings::replace_first( $first_tag_html, $first_tag_html . $open_container_entry_point_html, $html );
-		$html = Strings::replace_last( $last_tag_html, $close_container_entry_point_html . $last_tag_html, $html );
-
-		return $html;
-	}
-
-	/**
 	 * Based on a path it determines what is the namespace that should be used.
 	 *
 	 * @since 1.0.0
@@ -1118,20 +884,197 @@ class Template {
 	}
 
 	/**
-	 * Get the Entry Point Matches.
+	 * Sets the aliases the template should use.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string $html The html of the current template.
+	 * @param array<string,string> $aliases A map of aliases that should be used to add lookup locations, in the format
+	 *                                      `[ original => alias ]`;
 	 *
-	 * @return array An array of matches from the regular expression.
+	 * @return static This instance, for method chaining.
 	 */
-	private function get_entry_point_matches( $html ) {
-		$regexp = '/<(?<is_end>\/)*(?<tag>[A-Z0-9]*)(?:\b)*[^>]*>/mi';
+	public function set_aliases( array $aliases = [] ) {
+		$this->aliases = $aliases;
 
-		preg_match_all( $regexp, $html, $matches );
+		return $this;
+	}
 
-		return $matches;
+	/**
+	 * Fetches the path for locating files in the Plugin Folder
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string
+	 */
+	protected function get_template_plugin_path() {
+		$hook_prefix = Config::get_hook_prefix();
+
+		// Craft the plugin Path
+		$path = array_merge( $this->template_base_path, $this->folder );
+
+		// Implode to avoid Window Problems
+		$path = implode( DIRECTORY_SEPARATOR, $path );
+
+		/**
+		 * Allows filtering of the base path for templates
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $path     Complete path to include the base plugin folder
+		 * @param self   $template Current instance of the self.
+		 */
+		return apply_filters( "stellarwp/templates/{$hook_prefix}/template_plugin_path", $path, $this );
+	}
+
+	/**
+	 * Fetches the Namespace for the public paths, normally folders to look for
+	 * in the theme's directory.
+	 *
+	 * @since 1.0.0
+	 * @since 1.0.0
+	 *
+	 * @param string $plugin_namespace Overwrite the origin namespace with a given one.
+	 *
+	 * @return array Namespace where we to look for templates.
+	 */
+	protected function get_template_public_namespace( $plugin_namespace ) {
+		$hook_prefix = Config::get_hook_prefix();
+
+		$namespace = [
+			$hook_prefix,
+		];
+
+		if ( ! empty( $plugin_namespace ) ) {
+			$namespace[] = $plugin_namespace;
+		} elseif ( ! empty( $this->origin->template_namespace ) ) {
+			$namespace[] = $this->origin->template_namespace;
+		}
+
+		/**
+		 * Allows filtering of the base path for templates
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $namespace Which is the namespace we will look for files in the theme
+		 * @param self  $template  Current instance of the self.
+		 */
+		return apply_filters( "stellarwp/templates/{$hook_prefix}/template_public_namespace", $namespace, $this );
+	}
+
+	/**
+	 * Fetches the path for locating files given a base folder normally theme related.
+	 *
+	 * @since 1.0.0
+	 * @since 1.0.0
+	 *
+	 * @param mixed  $base      Base path to look into.
+	 * @param string $namespace Adds the plugin namespace to the path returned.
+	 *
+	 * @return string  The public path for a given base.˙˙
+	 */
+	protected function get_template_public_path( $base, $namespace ) {
+		$hook_prefix = Config::get_hook_prefix();
+
+		// Craft the plugin Path
+		$path = array_merge( Arr::wrap( $base ), $this->get_template_public_namespace( $namespace ) );
+
+		// Pick up if the folder needs to be added to the public template path.
+		$folder = array_diff( $this->folder, $this->get_template_origin_base_folder() );
+
+		if ( ! empty( $folder ) ) {
+			$path = array_merge( $path, $folder );
+		}
+
+		// Implode to avoid Window Problems
+		$path = implode( DIRECTORY_SEPARATOR, $path );
+
+		/**
+		 * Allows filtering of the base path for templates
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $path     Complete path to include the base public folder
+		 * @param self   $template Current instance of the self.
+		 */
+		return apply_filters( "stellarwp/templates/{$hook_prefix}/template_public_path", $path, $this );
+	}
+
+	/**
+	 * Fetches the folders in which we will look for a given file
+	 *
+	 * @since 1.0.0
+	 * @since 1.0.0
+	 *
+	 * @return array<string,array> A list of possible locations for the template file.
+	 */
+	protected function get_template_path_list() {
+		$hook_prefix = Config::get_hook_prefix();
+		$folders     = [];
+
+		$folders['plugin'] = [
+			'id'       => 'plugin',
+			'priority' => 20,
+			'path'     => $this->get_template_plugin_path(),
+		];
+
+		$folders = array_merge( $folders, $this->apply_aliases( $folders ) );
+
+		/**
+		 * Allows filtering of the list of folders in which we will look for the
+		 * template given.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $folders  Complete path to include the base public folder
+		 * @param self  $template Current instance of the self.
+		 */
+		$folders = apply_filters( "stellarwp/templates/{$hook_prefix}/template_path_list", $folders, $this );
+		$folders = Arr::wrap( $folders );
+
+		Arr::sort_by_priority( $folders );
+
+		return $folders;
+	}
+
+	/**
+	 * Get the list of theme related folders we will look up for the template.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $namespace Which plugin namespace we are looking for.
+	 *
+	 * @return array
+	 */
+	protected function get_template_theme_path_list( $namespace ) {
+		$hook_prefix = Config::get_hook_prefix();
+		$folders     = [];
+
+		$folders['child-theme']  = [
+			'id'       => 'child-theme',
+			'priority' => 10,
+			'path'     => $this->get_template_public_path( STYLESHEETPATH, $namespace ),
+		];
+		$folders['parent-theme'] = [
+			'id'       => 'parent-theme',
+			'priority' => 15,
+			'path'     => $this->get_template_public_path( TEMPLATEPATH, $namespace ),
+		];
+
+		/**
+		 * Allows filtering of the list of theme folders in which we will look for the template.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array  $folders   Complete path to include the base public folder.
+		 * @param string $namespace Loads the files from a specified folder from the themes.
+		 * @param self   $template  Current instance of the self.
+		 */
+		$folders = apply_filters( "stellarwp/templates/{$hook_prefix}/template_theme_path_list", $folders, $namespace, $this );
+		$folders = Arr::wrap( $folders );
+
+		Arr::sort_by_priority( $folders );
+
+		return $folders;
 	}
 
 	/**
@@ -1164,22 +1107,6 @@ class Template {
 		 * @param self   $template Current instance of the self.
 		 */
 		return apply_filters( "stellarwp/templates/{$hook_prefix}/template_common_path", $path, $this );
-	}
-
-	/**
-	 * Sets the aliases the template should use.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param array<string,string> $aliases A map of aliases that should be used to add lookup locations, in the format
-	 *                                      `[ original => alias ]`;
-	 *
-	 * @return static This instance, for method chaining.
-	 */
-	public function set_aliases( array $aliases = [] ) {
-		$this->aliases = $aliases;
-
-		return $this;
 	}
 
 	/**
@@ -1495,5 +1422,78 @@ class Template {
 		do_action( "stellarwp/templates/{$hook_prefix}/template_after_include:{$hook_name}", $file, $name, $this );
 
 		return ob_get_clean();
+	}
+
+	/**
+	 * Run the hooks for the container entry points.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $html The html of the current template.
+	 *
+	 * @return string Either the final entry point content HTML or `false` if no entry point could be found or set to false.
+	 */
+	private function template_hook_container_entry_points( $html ) {
+
+		$matches      = $this->get_entry_point_matches( $html );
+		$html_matches = $matches[0];
+
+		if ( 0 === count( $html_matches ) ) {
+			return $html;
+		}
+
+		$html_tags      = $matches['tag'];
+		$html_tags_ends = $matches['is_end'];
+
+		// Get first and last tags.
+		$first_tag = reset( $html_tags );
+		$last_tag  = end( $html_tags );
+
+		// Determine if first last tags are tag ends.
+		$first_tag_is_end = '/' === reset( $html_tags_ends );
+		$last_tag_is_end  = '/' === end( $html_tags_ends );
+
+		// When first and last tag are not the same, bail.
+		if ( $first_tag !== $last_tag ) {
+			return $html;
+		}
+
+		// If the first tag is a html tag end, bail.
+		if ( $first_tag_is_end ) {
+			return $html;
+		}
+
+		// If the last tag is not and html tag end, bail.
+		if ( ! $last_tag_is_end ) {
+			return $html;
+		}
+
+		$first_tag_html = reset( $html_matches );
+		$last_tag_html  = end( $html_matches );
+
+		$open_container_entry_point_html  = $this->do_entry_point( 'after_container_open', false );
+		$close_container_entry_point_html = $this->do_entry_point( 'before_container_close', false );
+
+		$html = Strings::replace_first( $first_tag_html, $first_tag_html . $open_container_entry_point_html, $html );
+		$html = Strings::replace_last( $last_tag_html, $close_container_entry_point_html . $last_tag_html, $html );
+
+		return $html;
+	}
+
+	/**
+	 * Get the Entry Point Matches.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $html The html of the current template.
+	 *
+	 * @return array An array of matches from the regular expression.
+	 */
+	private function get_entry_point_matches( $html ) {
+		$regexp = '/<(?<is_end>\/)*(?<tag>[A-Z0-9]*)(?:\b)*[^>]*>/mi';
+
+		preg_match_all( $regexp, $html, $matches );
+
+		return $matches;
 	}
 }
