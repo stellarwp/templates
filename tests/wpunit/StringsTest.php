@@ -53,4 +53,24 @@ class StringsTest extends TemplateTestCase {
 
 		$this->assertSame( $expected, $actual );
 	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_return_successfully_replacing_first_with_empty_string(): void {
+		$expected = '';
+		$actual   = Strings::replace_first( 'bacon', 'eggs', '' );
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_return_successfully_replacing_last_with_empty_string(): void {
+		$expected = '';
+		$actual   = Strings::replace_last( 'bacon', 'eggs', '' );
+
+		$this->assertSame( $expected, $actual );
+	}
 }
