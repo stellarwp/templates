@@ -30,12 +30,12 @@ class Part_Cache {
 	protected string $key;
 
 	/**
-	 ** Short description
+	 * * Short description
 	 *
 	 * @param $template           - which template in the views directory is being cached (relative path).
 	 * @param $id                 - a unique identifier for this fragment.
 	 * @param $expiration         - expiration time for the cached fragment.
-	 * @param $expiration_trigger - wordpress hook to expire on.
+	 * @param $expiration_trigger - WordPress hook to expire on.
 	 */
 	public function __construct( $template, $id, $expiration, $expiration_trigger ) {
 		$this->template           = $template;
@@ -49,7 +49,7 @@ class Part_Cache {
 	/**
 	 * Hook in to show cached content and bypass queries where needed
 	 */
-	public function add_hooks() {
+	public function add_hooks(): void {
 		$hook_prefix = Config::get_hook_prefix();
 
 		// set the cached html in transients after the template part is included
@@ -110,6 +110,5 @@ class Part_Cache {
 		$this->html = get_transient( "{$this->key}|{$this->expiration_trigger}" );
 
 		return $this->html;
-
 	}
 }

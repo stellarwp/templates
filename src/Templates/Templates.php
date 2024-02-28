@@ -46,11 +46,9 @@ class Templates {
 			if ( file_exists( get_stylesheet_directory() . '/' . $filename ) ) {
 				$located = trailingslashit( get_stylesheet_directory_uri() ) . $filename;
 				break;
-			} else {
-				if ( file_exists( get_template_directory() . '/' . $filename ) ) {
+			} elseif ( file_exists( get_template_directory() . '/' . $filename ) ) {
 					$located = trailingslashit( get_template_directory_uri() ) . $filename;
 					break;
-				}
 			}
 		}
 

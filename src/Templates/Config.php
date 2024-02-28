@@ -44,9 +44,9 @@ class Config {
 	/**
 	 * Resets this class back to the defaults.
 	 */
-	public static function reset() {
-		static::$hook_prefix         = '';
-		static::$root_path           = '';
+	public static function reset(): void {
+		static::$hook_prefix = '';
+		static::$root_path   = '';
 	}
 
 	/**
@@ -56,7 +56,7 @@ class Config {
 	 *
 	 * @return void
 	 */
-	public static function set_hook_prefix( string $prefix ) {
+	public static function set_hook_prefix( string $prefix ): void {
 		static::$hook_prefix = $prefix;
 	}
 
@@ -67,7 +67,7 @@ class Config {
 	 *
 	 * @return void
 	 */
-	public static function set_path( string $path ) {
+	public static function set_path( string $path ): void {
 		static::$root_path = trailingslashit( $path );
 	}
 }
