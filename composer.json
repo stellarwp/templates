@@ -32,7 +32,8 @@
     "lucatume/wp-browser": "^3.2.3",
     "szepeviktor/phpstan-wordpress": "^1.1",
     "symfony/event-dispatcher-contracts": "^2.5.1",
-    "symfony/string": "^5.4"
+    "symfony/string": "^5.4",
+    "stellarwp/coding-standards": "^2.0"
   },
   "scripts": {
     "test:analysis": [
@@ -41,5 +42,10 @@
   },
   "scripts-descriptions": {
     "test:analysis": "Run static code analysis."
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }
