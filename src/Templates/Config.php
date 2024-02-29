@@ -1,22 +1,46 @@
 <?php
+/**
+ * Handles all configuration values for the library.
+ *
+ * @since 1.0.0
+ *
+ * @package StellarWP\Templates
+ */
 
 namespace StellarWP\Templates;
 
 use RuntimeException;
 
+/**
+ * A configuration class for setting up the library.
+ *
+ * @since 1.0.0
+ *
+ * @package StellarWP\Templates
+ */
 class Config {
 	/**
+	 * The prefix to apply to all library hooks.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @var string
 	 */
 	protected static string $hook_prefix = '';
 
 	/**
+	 * The root path to use for all templates.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @var string
 	 */
 	protected static string $root_path = '';
 
 	/**
 	 * Gets the hook prefix.
+	 *
+	 * @throws RuntimeException When a hook prefix is not set.
 	 *
 	 * @return string
 	 */
@@ -30,6 +54,8 @@ class Config {
 
 	/**
 	 * Gets the root path of the project.
+	 *
+	 * @throws RuntimeException When a root template path is not set.
 	 *
 	 * @return string
 	 */

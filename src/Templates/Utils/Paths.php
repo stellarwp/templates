@@ -3,6 +3,8 @@
  * Utilities to manipulate file-system paths.
  *
  * @since 1.0.0
+ *
+ * @package StellarWP\Templates
  */
 
 namespace StellarWP\Templates\Utils;
@@ -11,6 +13,8 @@ namespace StellarWP\Templates\Utils;
  * Class Paths
  *
  * @since 1.0.0
+ *
+ * @package StellarWP\Templates
  */
 class Paths {
 
@@ -54,7 +58,8 @@ class Paths {
 
 		$trimmed_path_2 = trim(
 			preg_replace(
-				'#^' . preg_quote( implode( DIRECTORY_SEPARATOR, $non_consecutive_common ), '#' ) . '#', '',
+				'#^' . preg_quote( implode( DIRECTORY_SEPARATOR, $non_consecutive_common ), '#' ) . '#',
+				'',
 				implode( DIRECTORY_SEPARATOR, $path_2_frags )
 			),
 			'\\/'

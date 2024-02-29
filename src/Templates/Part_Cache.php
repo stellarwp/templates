@@ -134,7 +134,9 @@ class Part_Cache {
 	}
 
 	/**
-	 * Retrieve the cached html from transients, set class property
+	 * Retrieve the cached html from transients, set class property.
+	 *
+	 * @return string|bool
 	 */
 	public function get() {
 
