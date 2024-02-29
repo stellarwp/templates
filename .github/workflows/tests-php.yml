@@ -100,8 +100,5 @@ jobs:
           ${SLIC_BIN} composer validate
           ${SLIC_BIN} composer install
 
-      - name: Run suite wpunit (singlesite)
-        run: ${SLIC_BIN} run wpunit --env singlesite --ext DotReporter
-
-      - name: Run suite wpunit (multisite)
-        run: ${SLIC_BIN} run wpunit --env multisite --ext DotReporter
+      - name: Run suite wpunit
+        run: ${SLIC_BIN} run wpunit --ext DotReporter
