@@ -3,11 +3,21 @@ on:
   push:
 jobs:
   test:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        suite:
-          - wpunit
-    runs-on: ubuntu-latest
+        wordpress:
+          - latest
+          - '6.3.3'
+          - '6.2.4'
+
+        php:
+          - '7.4'
+          - '8.0'
+          - '8.1'
+          - '8.2'
+
+    name: "Tests: WP ${{ matrix.wordpress }} / PHP ${{ matrix.php }}"
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
@@ -18,7 +28,7 @@ jobs:
       # Checkout slic
       # ------------------------------------------------------------------------------
       - name: Checkout slic
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: stellarwp/slic
           ref: main
@@ -30,14 +40,15 @@ jobs:
       - name: Get Composer Cache Directory
         id: get-composer-cache-dir
         run: |
-          echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - uses: actions/cache@v2
+          echo "DIR=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
         id: composer-cache
         with:
-          path: ${{ steps.get-composer-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          path: ${{ steps.get-composer-cache-dir.outputs.DIR }}
+          key: ${{ matrix.php }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: |
-            ${{ runner.os }}-composer-
+            ${{ matrix.php }}-composer-
       # ------------------------------------------------------------------------------
       # Initialize slic
       # ------------------------------------------------------------------------------
@@ -46,14 +57,18 @@ jobs:
           echo "SLIC_BIN=${GITHUB_WORKSPACE}/slic/slic" >> $GITHUB_ENV
           echo "SLIC_WP_DIR=${GITHUB_WORKSPACE}/slic/_wordpress" >> $GITHUB_ENV
           echo "SLIC_WORDPRESS_DOCKERFILE=Dockerfile.base" >> $GITHUB_ENV
+
       - name: Set run context for slic
         run: echo "SLIC=1" >> $GITHUB_ENV && echo "CI=1" >> $GITHUB_ENV
+
       - name: Start ssh-agent
         run: |
           mkdir -p "${HOME}/.ssh";
           ssh-agent -a /tmp/ssh_agent.sock;
+
       - name: Export SSH_AUTH_SOCK env var
         run: echo "SSH_AUTH_SOCK=/tmp/ssh_agent.sock" >> $GITHUB_ENV
+
       - name: Set up slic for CI
         run: |
           cd ${GITHUB_WORKSPACE}/..
@@ -63,11 +78,30 @@ jobs:
           ${SLIC_BIN} build-subdir off
           ${SLIC_BIN} xdebug off
           ${SLIC_BIN} debug on
+          ${SLIC_BIN} php-version set ${{ matrix.php }} --skip-rebuild
+          ${SLIC_BIN} composer-cache set ${{ steps.get-composer-cache-dir.outputs.DIR }}
           ${SLIC_BIN} info
           ${SLIC_BIN} config
+
+      - name: Install specific WordPress version ${{ matrix.wordpress }}
+        run: |
+          ${SLIC_BIN} wp core download --version=${{ matrix.wordpress }} --force
+
+      - name: Show WordPress version
+        run: ${SLIC_BIN} wp core version
+
+      - name: Update installed WordPress themes
+        run: ${SLIC_BIN} wp theme update --all
+
       - name: Set up StellarWP Templates
         run: |
           ${SLIC_BIN} use templates
+          ${SLIC_BIN} composer set-version 2
+          ${SLIC_BIN} composer validate
           ${SLIC_BIN} composer install
-      - name: Run suite wpunit
-        run: ${SLIC_BIN} run ${{ matrix.suite }} --ext DotReporter
+
+      - name: Run suite wpunit (singlesite)
+        run: ${SLIC_BIN} run wpunit --env singlesite --ext DotReporter
+
+      - name: Run suite wpunit (multisite)
+        run: ${SLIC_BIN} run wpunit --env multisite --ext DotReporter
