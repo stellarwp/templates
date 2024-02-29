@@ -136,17 +136,14 @@ class Part_Cache {
 	/**
 	 * Retrieve the cached html from transients, set class property.
 	 *
-	 * @return string|bool
+	 * @return void
 	 */
 	public function get() {
 
-		if ( isset( $this->html ) ) {
-
-			return $this->html;
+		if ( ! isset( $this->html ) ) {
+			$this->html = get_transient( "{$this->key}|{$this->expiration_trigger}" );
 		}
 
-		$this->html = get_transient( "{$this->key}|{$this->expiration_trigger}" );
-
-		return $this->html;
+		echo esc_html( $this->html );
 	}
 }
