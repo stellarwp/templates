@@ -1,4 +1,11 @@
 <?php
+/**
+ * Handles all functionality for templates.
+ *
+ * @since 1.0.0
+ *
+ * @package StellarWP\Templates
+ */
 
 namespace StellarWP\Templates;
 
@@ -8,6 +15,13 @@ use StellarWP\Templates\Utils\Conditions;
 use StellarWP\Templates\Utils\Paths;
 use StellarWP\Templates\Utils\Strings;
 
+/**
+ * Handles all functionality for templates.
+ *
+ * @since 1.0.0
+ *
+ * @package StellarWP\Templates
+ */
 class Template {
 	/**
 	 * The origin class for the plugin where the template lives
@@ -114,7 +128,9 @@ class Template {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param object|string $origin The base origin for the templates
+	 * @param object|string $origin The base origin for the templates.
+	 *
+	 * @throws InvalidArgumentException When an origin class is not valid.
 	 *
 	 * @return static
 	 */
@@ -124,7 +140,7 @@ class Template {
 		}
 
 		if ( is_string( $origin ) ) {
-			// Origin needs to be a class with a `instance` method
+			// Origin needs to be a class with a `instance` method.
 			if ( class_exists( $origin ) && method_exists( $origin, 'instance' ) ) {
 				$origin = call_user_func( [ $origin, 'instance' ] ); // @phpstan-ignore-line If we get here, we know the object is an object.
 			}
@@ -132,7 +148,7 @@ class Template {
 
 		if (
 			empty( $origin->plugin_path )
-			&& empty( $origin->pluginPath )
+			&& empty( $origin->pluginPath ) // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 			&& ! is_dir( $origin )
 		) {
 			throw new InvalidArgumentException( 'Invalid Origin Class for Template Instance' );
@@ -159,22 +175,22 @@ class Template {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array|string $folder Which folder we are going to look for templates
+	 * @param array|string $folder Which folder we are going to look for templates in.
 	 *
 	 * @return self
 	 */
 	public function set_template_folder( $folder = null ): self {
-		// Allows configuring a already set class
+		// Allows configuring a already set class.
 		if ( ! isset( $folder ) ) {
 			$folder = $this->folder;
 		}
 
-		// If Folder is String make it an Array
+		// If Folder is String make it an Array.
 		if ( is_string( $folder ) ) {
 			$folder = explode( '/', $folder );
 		}
 
-		// Cast as Array and save
+		// Cast as Array and save.
 		$this->folder = Arr::wrap( $folder );
 
 		return $this;
@@ -222,12 +238,12 @@ class Template {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $context Default global Context
+	 * @param array $context The default global context.
 	 *
 	 * @return self
 	 */
 	public function add_template_globals( $context = [] ) {
-		// Cast as Array merge and save
+		// Cast as Array merge and save.
 		$this->global = wp_parse_args( Arr::wrap( $context ), $this->global );
 
 		return $this;
@@ -238,12 +254,12 @@ class Template {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param bool $value Should we extract context for templates
+	 * @param bool $value Should we extract context for templates.
 	 *
 	 * @return self
 	 */
 	public function set_template_context_extract( $value = false ) {
-		// Cast as bool and save
+		// Cast as bool and save.
 		$this->template_context_extract = Conditions::is_truthy( $value );
 
 		return $this;
@@ -283,14 +299,13 @@ class Template {
 	 *
 	 * @since  1.0.0
 	 *
-	 * @param array|string $index    Specify each nested index in order.
-	 *                               Example: [ 'lvl1', 'lvl2' ];
+	 * @param array|string $index    Specify each nested index in order (e.g. [ 'lvl1', 'lvl2' ]).
 	 * @param mixed        $default  Default value if the search finds nothing.
 	 * @param boolean      $is_local Use the Local or Global context.
 	 *
 	 * @return mixed The value of the specified index or the default if not found.
 	 */
-	final public function get( $index, $default = null, $is_local = true ) {
+	final public function get( $index, $default = null, $is_local = true ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.defaultFound
 		$hook_prefix = Config::get_hook_prefix();
 		$context     = $this->get_global_values();
 
@@ -305,8 +320,7 @@ class Template {
 		 * @since 1.0.0
 		 *
 		 * @param mixed        $value    The value that will be filtered.
-		 * @param array|string $index    Specify each nested index in order.
-		 *                               Example: [ 'lvl1', 'lvl2' ];
+		 * @param array|string $index    Specify each nested index in order (e.g. [ 'lvl1', 'lvl2' ]).
 		 * @param mixed        $default  Default value if the search finds nothing.
 		 * @param boolean      $is_local Use the Local or Global context.
 		 * @param self         $template Current instance of the self.
@@ -328,11 +342,9 @@ class Template {
 	 *
 	 * @since  1.0.0
 	 *
-	 * @param string|array $index       To set a key nested multiple levels deep pass an array
-	 *                                  specifying each key in order as a value.
-	 *                                  Example: array( 'lvl1', 'lvl2', 'lvl3' );
+	 * @param string|array $index       To set a key nested multiple levels deep pass an array specifying each key in order as a value (e.g. [ 'lvl1', 'lvl2', 'lvl3' ]).
 	 * @param mixed        $value       The value.
-	 * @param boolean      $is_local    Use the Local or Global context
+	 * @param boolean      $is_local    Use the Local or Global context.
 	 *
 	 * @return array Full array with the key set to the specified value.
 	 */
@@ -362,7 +374,7 @@ class Template {
 	public function merge_context( $context = [], $file = null, $name = null ) {
 		$hook_prefix = Config::get_hook_prefix();
 
-		// Allow for simple null usage as well as array() for nothing
+		// Allow for simple null usage as well as array() for nothing.
 		if ( is_null( $context ) ) {
 			$context = [];
 		}
@@ -433,7 +445,7 @@ class Template {
 	public function get_template_file( $name ) {
 		$hook_prefix = Config::get_hook_prefix();
 
-		// If name is String make it an Array
+		// If name is String make it an Array.
 		if ( is_string( $name ) ) {
 			$name = (array) explode( '/', $name );
 		}
@@ -447,13 +459,13 @@ class Template {
 				continue;
 			}
 
-			// Build the File Path
+			// Build the File Path.
 			$file = Paths::merge( $folder['path'], $name );
 
-			// Append the Extension to the file path
+			// Append the Extension to the file path.
 			$file .= '.php';
 
-			// Skip non-existent files
+			// Skip non-existent files.
 			if ( file_exists( $file ) ) {
 				$found_file = $file;
 				$namespace  = ! empty( $folder['namespace'] ) ? $folder['namespace'] : false;
@@ -469,13 +481,13 @@ class Template {
 					continue;
 				}
 
-				// Build the File Path
+				// Build the File Path.
 				$file = implode( DIRECTORY_SEPARATOR, array_merge( Arr::wrap( $folder['path'] ), $name ) );
 
-				// Append the Extension to the file path
+				// Append the Extension to the file path.
 				$file .= '.php';
 
-				// Skip non-existent files
+				// Skip non-existent files.
 				if ( file_exists( $file ) ) {
 					$found_file = $file;
 					break;
@@ -497,7 +509,7 @@ class Template {
 			return apply_filters( "stellarwp/templates/{$hook_prefix}/template_file", $found_file, $name, $this );
 		}
 
-		// Couldn't find a template on the Stack
+		// Couldn't find a template on the Stack.
 		return false;
 	}
 
@@ -509,7 +521,7 @@ class Template {
 	 *
 	 * @return null|string `null` if an entry point is disabled or the entry point HTML.
 	 */
-	public function do_entry_point( $entry_point_name, $echo = true ) {
+	public function do_entry_point( $entry_point_name, $echo = true ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.echoFound
 		$hook_prefix = Config::get_hook_prefix();
 		$hook_name   = $this->get_template_current_hook_name();
 
@@ -588,7 +600,7 @@ class Template {
 		}
 
 		if ( $echo ) {
-			echo $html;
+			echo esc_html( $html );
 		}
 
 		return $html;
@@ -601,14 +613,14 @@ class Template {
 	 *
 	 * @param string|array $name    Which file we are talking about including.
 	 *                              If an array, each item will add a directory separator to get to the single template.
-	 * @param array        $context Any context data you need to expose to this file
-	 * @param boolean      $echo    If we should also print the Template
+	 * @param array        $context Any context data you need to expose to this file.
+	 * @param boolean      $echo    If we should also print the Template.
 	 *
 	 * @return string|false Either the final content HTML or `false` if no template could be found.
 	 */
-	public function template( $name, $context = [], $echo = true ) {
-		static $file_exists = [];
-		static $files = [];
+	public function template( $name, $context = [], $echo = true ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.echoFound,Generic.NamingConventions.ConstructorName.OldStyle
+		static $file_exists    = [];
+		static $files          = [];
 		static $template_names = [];
 
 		$hook_prefix = Config::get_hook_prefix();
@@ -634,12 +646,12 @@ class Template {
 
 		// Cache template name massaging so we don't have to repeat these actions.
 		if ( ! isset( $template_names[ $cache_name_key ] ) ) {
-			// If name is String make it an Array
+			// If name is String make it an Array.
 			if ( is_string( $name ) ) {
 				$name = (array) explode( '/', $name );
 			}
 
-			// Clean this Variable
+			// Clean this Variable.
 			$name = array_map( 'sanitize_title_with_dashes', $name );
 
 			$template_names[ $cache_name_key ] = $name;
@@ -650,17 +662,20 @@ class Template {
 			! isset( $file_exists[ $cache_name_key ] )
 			|| ! isset( $files[ $cache_name_key ] )
 		) {
-			// Check if the file exists
-			$files[ $cache_name_key ] = $file = $this->get_template_file( $name );
+			// Check if the file exists.
+			$file                     = $this->get_template_file( $name );
+			$files[ $cache_name_key ] = $this->get_template_file( $name );
 
-			// Check if it's a valid variable
+			// Check if it's a valid variable.
 			if ( ! $file ) {
-				return $file_exists[ $cache_name_key ] = false;
+				$file_exists[ $cache_name_key ] = false;
+				return $file_exists[ $cache_name_key ];
 			}
 
-			// Before we load the file we check if it exists
+			// Before we load the file we check if it exists.
 			if ( ! file_exists( $file ) ) {
-				return $file_exists[ $cache_name_key ] = false;
+				$file_exists[ $cache_name_key ] = false;
+				return $file_exists[ $cache_name_key ];
 			}
 
 			$file_exists[ $cache_name_key ] = true;
@@ -675,8 +690,9 @@ class Template {
 		$file                   = $files[ $cache_name_key ];
 		$name                   = $template_names[ $cache_name_key ];
 		$origin_folder_appendix = array_diff( $this->folder, $this->template_origin_base_folder );
+		$origin_namespace       = $this->template_get_origin_namespace( $file );
 
-		if ( $origin_namespace = $this->template_get_origin_namespace( $file ) ) {
+		if ( $origin_namespace ) {
 			$legacy_namespace = array_merge( Arr::wrap( $origin_namespace ), $name );
 			$namespace        = array_merge( Arr::wrap( $origin_namespace ), $origin_folder_appendix, $name );
 		} else {
@@ -725,7 +741,7 @@ class Template {
 			return $pre_html;
 		}
 
-		// Merges the local data passed to template to the global scope
+		// Merges the local data passed to template to the global scope.
 		$this->merge_context( $context, $file, $name );
 
 		$before_include_html = $this->actions_before_template( $file, $name, $hook_name );
@@ -737,7 +753,7 @@ class Template {
 		$after_include_html = $this->actions_after_template( $file, $name, $hook_name );
 		$after_include_html = $this->filter_template_after_include_html( $after_include_html, $file, $name, $hook_name );
 
-		// Only fetch the contents after the action
+		// Only fetch the contents after the action.
 		$html = $before_include_html . $include_html . $after_include_html;
 
 		$html = $this->filter_template_html( $html, $file, $name, $hook_name );
@@ -746,7 +762,7 @@ class Template {
 		$html = $this->template_hook_container_entry_points( $html );
 
 		if ( $echo ) {
-			echo $html;
+			echo esc_html( $html );
 		}
 
 		// Revert the current hook name.
@@ -838,9 +854,10 @@ class Template {
 	 * @see   static::set()
 	 * @since 1.0.0
 	 *
-	 * @param bool  $is_local Whether to set the values as global or local; defaults to local as the `set` method does.
-	 *
 	 * @param array $values   An associative key/value array of the values to set.
+	 * @param bool  $is_local Whether to set the values as global or local (defaults to local as the `set` method does).
+	 *
+	 * @return void
 	 */
 	public function set_values( array $values = [], $is_local = true ) {
 		foreach ( $values as $key => $value ) {
@@ -888,8 +905,7 @@ class Template {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array<string,string> $aliases A map of aliases that should be used to add lookup locations, in the format
-	 *                                      `[ original => alias ]`;
+	 * @param array<string,string> $aliases A map of aliases that should be used to add lookup locations, in the format [ original => alias ].
 	 *
 	 * @return static This instance, for method chaining.
 	 */
@@ -909,10 +925,10 @@ class Template {
 	protected function get_template_plugin_path() {
 		$hook_prefix = Config::get_hook_prefix();
 
-		// Craft the plugin Path
+		// Craft the plugin Path.
 		$path = array_merge( $this->template_base_path, $this->folder );
 
-		// Implode to avoid Window Problems
+		// Implode to avoid Window Problems.
 		$path = implode( DIRECTORY_SEPARATOR, $path );
 
 		/**
@@ -972,10 +988,10 @@ class Template {
 	 *
 	 * @return string  The public path for a given base.˙˙
 	 */
-	protected function get_template_public_path( $base, $namespace ) {
+	protected function get_template_public_path( $base, $namespace ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.namespaceFound
 		$hook_prefix = Config::get_hook_prefix();
 
-		// Craft the plugin Path
+		// Craft the plugin Path.
 		$path = array_merge( Arr::wrap( $base ), $this->get_template_public_namespace( $namespace ) );
 
 		// Pick up if the folder needs to be added to the public template path.
@@ -985,7 +1001,7 @@ class Template {
 			$path = array_merge( $path, $folder );
 		}
 
-		// Implode to avoid Window Problems
+		// Implode to avoid Window Problems.
 		$path = implode( DIRECTORY_SEPARATOR, $path );
 
 		/**
@@ -1045,19 +1061,19 @@ class Template {
 	 *
 	 * @return array
 	 */
-	protected function get_template_theme_path_list( $namespace ) {
+	protected function get_template_theme_path_list( $namespace ) { // phpcs:ignore Universal.NamingConventions.NoReservedKeywordParameterNames.namespaceFound
 		$hook_prefix = Config::get_hook_prefix();
 		$folders     = [];
 
 		$folders['child-theme']  = [
 			'id'       => 'child-theme',
 			'priority' => 10,
-			'path'     => $this->get_template_public_path( STYLESHEETPATH, $namespace ),
+			'path'     => $this->get_template_public_path( get_stylesheet_directory(), $namespace ),
 		];
 		$folders['parent-theme'] = [
 			'id'       => 'parent-theme',
 			'priority' => 15,
-			'path'     => $this->get_template_public_path( TEMPLATEPATH, $namespace ),
+			'path'     => $this->get_template_public_path( get_template_directory(), $namespace ),
 		];
 
 		/**

@@ -3,6 +3,8 @@
  * String Utilities
  *
  * @since 1.0.0
+ *
+ * @package StellarWP\Templates
  */
 
 namespace StellarWP\Templates\Utils;
@@ -11,6 +13,8 @@ namespace StellarWP\Templates\Utils;
  * Class Strings
  *
  * @since 1.0.0
+ *
+ * @package StellarWP\Templates
  */
 class Strings {
 

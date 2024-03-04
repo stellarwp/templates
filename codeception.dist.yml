@@ -1,5 +1,8 @@
 actor: Tester
-bootstrap: _bootstrap.php
+coverage:
+    enabled: true
+    include:
+      - src/*.php
 paths:
     tests: tests
     log: tests/_output

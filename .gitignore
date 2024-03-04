@@ -25,3 +25,6 @@ tests/*.suite.yml
 tests/*.pem
 tests/*.cert
 tests/*.key
+
+# Coding Standards
+phpcs.xml

@@ -1,6 +1,10 @@
 <?php
 /**
  * Templating functionality.
+ *
+ * @since 1.0.0
+ *
+ * @package StellarWP\Templates
  */
 
 namespace StellarWP\Templates;
@@ -10,6 +14,10 @@ use WP_Query;
 
 /**
  * Handle views and template files.
+ *
+ * @since 1.0.0
+ *
+ * @package StellarWP\Templates
  */
 class Templates {
 	/**
@@ -17,7 +25,7 @@ class Templates {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param WP_Query $query
+	 * @param WP_Query $query The current query.
 	 *
 	 * @return bool
 	 */
@@ -30,8 +38,8 @@ class Templates {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array|string $stylesheets Path to the stylesheet
-	 * @param string       $fallback    Path to fallback stylesheet
+	 * @param array|string $stylesheets Path to the stylesheet.
+	 * @param string       $fallback    Path to fallback stylesheet.
 	 *
 	 * @return string Path to stylesheet
 	 */
@@ -46,11 +54,9 @@ class Templates {
 			if ( file_exists( get_stylesheet_directory() . '/' . $filename ) ) {
 				$located = trailingslashit( get_stylesheet_directory_uri() ) . $filename;
 				break;
-			} else {
-				if ( file_exists( get_template_directory() . '/' . $filename ) ) {
+			} elseif ( file_exists( get_template_directory() . '/' . $filename ) ) {
 					$located = trailingslashit( get_template_directory_uri() ) . $filename;
 					break;
-				}
 			}
 		}
 
