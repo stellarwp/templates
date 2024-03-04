@@ -1,22 +1,46 @@
 <?php
+/**
+ * Handles all configuration values for the library.
+ *
+ * @since 1.0.0
+ *
+ * @package StellarWP\Templates
+ */
 
 namespace StellarWP\Templates;
 
 use RuntimeException;
 
+/**
+ * A configuration class for setting up the library.
+ *
+ * @since 1.0.0
+ *
+ * @package StellarWP\Templates
+ */
 class Config {
 	/**
+	 * The prefix to apply to all library hooks.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @var string
 	 */
 	protected static string $hook_prefix = '';
 
 	/**
+	 * The root path to use for all templates.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @var string
 	 */
 	protected static string $root_path = '';
 
 	/**
 	 * Gets the hook prefix.
+	 *
+	 * @throws RuntimeException When a hook prefix is not set.
 	 *
 	 * @return string
 	 */
@@ -31,6 +55,8 @@ class Config {
 	/**
 	 * Gets the root path of the project.
 	 *
+	 * @throws RuntimeException When a root template path is not set.
+	 *
 	 * @return string
 	 */
 	public static function get_path(): string {
@@ -44,9 +70,9 @@ class Config {
 	/**
 	 * Resets this class back to the defaults.
 	 */
-	public static function reset() {
-		static::$hook_prefix         = '';
-		static::$root_path           = '';
+	public static function reset(): void {
+		static::$hook_prefix = '';
+		static::$root_path   = '';
 	}
 
 	/**
@@ -56,7 +82,7 @@ class Config {
 	 *
 	 * @return void
 	 */
-	public static function set_hook_prefix( string $prefix ) {
+	public static function set_hook_prefix( string $prefix ): void {
 		static::$hook_prefix = $prefix;
 	}
 
@@ -67,7 +93,7 @@ class Config {
 	 *
 	 * @return void
 	 */
-	public static function set_path( string $path ) {
+	public static function set_path( string $path ): void {
 		static::$root_path = trailingslashit( $path );
 	}
 }

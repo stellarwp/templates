@@ -1,41 +1,77 @@
 <?php
+/**
+ * A file for caching template parts.
+ *
+ * @since 1.0.0
+ *
+ * @package StellarWP\Templates
+ */
 
 namespace StellarWP\Templates;
 
+/**
+ * A class to handle caching template parts.
+ *
+ * @since 1.0.0
+ *
+ * @package StellarWP\Templates
+ */
 class Part_Cache {
 
 	/**
+	 * Which template in the views directory is being cached (relative path).
+	 *
+	 * @since 1.0.0
+	 *
 	 * @var string
 	 */
 	protected string $template;
 
 	/**
+	 * Expiration time for the cached fragment.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @var int
 	 */
 	protected int $expiration;
 
 	/**
+	 * WordPress hook to expire on.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @var string
 	 */
 	protected string $expiration_trigger;
 
 	/**
+	 * The cached rendered template.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @var string|bool|null
 	 */
 	protected $html;
 
 	/**
+	 * The key to save the cache with.
+	 *
+	 * @since 1.0.0
+	 *
 	 * @var string
 	 */
 	protected string $key;
 
 	/**
-	 ** Short description
+	 * The class constructor.
 	 *
-	 * @param $template           - which template in the views directory is being cached (relative path).
-	 * @param $id                 - a unique identifier for this fragment.
-	 * @param $expiration         - expiration time for the cached fragment.
-	 * @param $expiration_trigger - wordpress hook to expire on.
+	 * @since 1.0.0
+	 *
+	 * @param string $template           Which template in the views directory is being cached (relative path).
+	 * @param string $id                 A unique identifier for this fragment.
+	 * @param int    $expiration         Expiration time for the cached fragment.
+	 * @param string $expiration_trigger WordPress hook to expire on.
 	 */
 	public function __construct( $template, $id, $expiration, $expiration_trigger ) {
 		$this->template           = $template;
@@ -49,16 +85,16 @@ class Part_Cache {
 	/**
 	 * Hook in to show cached content and bypass queries where needed
 	 */
-	public function add_hooks() {
+	public function add_hooks(): void {
 		$hook_prefix = Config::get_hook_prefix();
 
-		// set the cached html in transients after the template part is included
+		// Set the cached html in transients after the template part is included.
 		add_filter( "stellarwp/templates/{$hook_prefix}/get_template_part_content", [ $this, 'set' ], 10, 2 );
 
-		// get the cached html right before the setup_view runs so it's available for bypassing any view logic
+		// Get the cached html right before the setup_view runs so it's available for bypassing any view logic.
 		add_action( "stellarwp/templates/{$hook_prefix}/before_view", [ $this, 'get' ], 9, 1 );
 
-		// when the specified template part is included, show the cached html instead
+		// When the specified template part is included, show the cached html instead.
 		add_filter( "stellarwp/templates/get_template_part_path_{$this->template}", [ $this, 'display' ] );
 	}
 
@@ -66,14 +102,14 @@ class Part_Cache {
 	 * Checks if there is a cached html fragment in the transients, if it's there,
 	 * don't include the requested file path. If not, just return the file path like normal
 	 *
-	 * @param $path file path to the month view template part
+	 * @param string $path File path to the month view template part.
 	 *
 	 * @return string
 	 */
 	public function display( $path ): string {
 
 		if ( $this->html !== false ) {
-			echo $this->html;
+			echo esc_html( $this->html );
 
 			return '';
 		}
@@ -82,10 +118,10 @@ class Part_Cache {
 	}
 
 	/**
-	 * Set cached html in transients
+	 * Set cached html in transients.
 	 *
-	 * @param $html
-	 * @param $template
+	 * @param string $html     The rendered HTML to cache.
+	 * @param string $template The template file path.
 	 *
 	 * @return string
 	 */
@@ -98,18 +134,16 @@ class Part_Cache {
 	}
 
 	/**
-	 * Retrieve the cached html from transients, set class property
+	 * Retrieve the cached html from transients, set class property.
+	 *
+	 * @return void
 	 */
 	public function get() {
 
-		if ( isset( $this->html ) ) {
-
-			return $this->html;
+		if ( ! isset( $this->html ) ) {
+			$this->html = get_transient( "{$this->key}|{$this->expiration_trigger}" );
 		}
 
-		$this->html = get_transient( "{$this->key}|{$this->expiration_trigger}" );
-
-		return $this->html;
-
+		echo esc_html( $this->html );
 	}
 }

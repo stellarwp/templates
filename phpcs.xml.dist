@@ -1,24 +1,20 @@
 <?xml version="1.0"?>
-<ruleset name="Commerce Components Coding Standards">
+<ruleset name="StellarWP Templates Coding Standards">
 
-    <rule ref="WordPress-VIP-Go"/>
+	<rule ref="WordPress-VIP-Go"/>
 
-    <rule ref="WordPress-Docs">
-        <exclude-pattern>*/tests/*</exclude-pattern>
-    </rule>
+	<rule ref="WordPress-Docs">
+		<exclude-pattern>*/tests/*</exclude-pattern>
+	</rule>
 
-    <rule ref="WordPress">
-        <exclude name="WordPress.Files.FileName"/>
-        <exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
-    </rule>
+	<rule ref="WordPress">
+		<exclude name="WordPress.Files.FileName"/>
+		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+		<exclude name="WordPress.PHP.YodaConditions.NotYoda"/>
+		<exclude name="WordPress.NamingConventions.ValidHookName.UseUnderscores"/>
+	</rule>
 
-    <rule ref="StellarWP"/>
+	<rule ref="StellarWP"/>
 
-    <!--exclude the rule for violation of direct DB calls as some have no alternative-->
-    <rule ref="WordPress.DB.DirectDatabaseQuery">
-        <exclude-pattern>src/Test.php</exclude-pattern>
-    </rule>
-
-    <exclude-pattern>*/tests/_support/_generated/*</exclude-pattern>
-    <exclude-pattern>*/vendor/*</exclude-pattern>
+	<file>./src</file>
 </ruleset>
