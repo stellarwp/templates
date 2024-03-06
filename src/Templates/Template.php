@@ -600,7 +600,7 @@ class Template {
 		}
 
 		if ( $echo ) {
-			echo esc_html( $html );
+			echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped,StellarWP.XSS.EscapeOutput.OutputNotEscaped
 		}
 
 		return $html;
