@@ -762,7 +762,7 @@ class Template {
 		$html = $this->template_hook_container_entry_points( $html );
 
 		if ( $echo ) {
-			echo esc_html( $html );
+			echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped,StellarWP.XSS.EscapeOutput.OutputNotEscaped
 		}
 
 		// Revert the current hook name.
