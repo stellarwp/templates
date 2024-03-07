@@ -20,7 +20,7 @@ jobs:
     name: "Tests: WP ${{ matrix.wordpress }} / PHP ${{ matrix.php }}"
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1000
           submodules: recursive
